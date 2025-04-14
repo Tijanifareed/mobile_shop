@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "516976619973",
+    "project_id": "shoppingapp-dd1b8",
+    "storage_bucket": "shoppingapp-dd1b8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:516976619973:android:47fb76907f14f487831bac",
+        "android_client_info": {
+          "package_name": "com.example.online_market"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyClFwFeFb9d6hiWGZpcEJ9GvNNPPmET4iI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:516976619973:android:70901474aa388cd7831bac",
+        "android_client_info": {
+          "package_name": "com.fareed.shopping.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyClFwFeFb9d6hiWGZpcEJ9GvNNPPmET4iI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
