@@ -21,6 +21,7 @@ class MyApp extends StatelessWidget {
         title: 'Shopping App',
         home: Scaffold(
         appBar: AppBar(title: const Text("Shopping App")),
+
     body: const Center(child: Text("Hello Firebase! you ")),
         ),
     );
