@@ -27,40 +27,44 @@ class _HomepageState extends State<Homepage> {
   final List<Widget> _pages = [
     HomeTab(),
     SearchPage(),
-    SizedBox(),
+    CartPage(productRepository: ProductRepository()),
     ProfilePage(),
   ];
 
   void _onTabTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      if (index == 2) {
+        _cartItems = repository.getAUserCart("HjkDCI3wsu5gRAQDL6Qx");
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _selectedIndex == 2
-          ? FutureBuilder<List<CartItem>>(
-        future: _cartItems,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            print(_cartItems);
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            print(_cartItems);
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No items in your cart.'));
-          } else {
-            return CartPage(
-              cartItems: snapshot.data!, // Pass the list of cart items
-              productRepository: ProductRepository(),
-            );
-          }
-        },
-      )
-          : _pages[_selectedIndex],
+      body: _pages[_selectedIndex],
+      // _selectedIndex == 2
+      //     ? FutureBuilder<List<CartItem>>(
+      //   future: _cartItems,
+      //   builder: (context, snapshot) {
+      //     if (snapshot.connectionState == ConnectionState.waiting) {
+      //       print(_cartItems);
+      //       return Center(child: CircularProgressIndicator());
+      //     } else if (snapshot.hasError) {
+      //       print(_cartItems);
+      //       return Center(child: Text('Error: ${snapshot.error}'));
+      //     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+      //       return Center(child: Text('No items in your cart.'));
+      //     } else {
+      //       return CartPage(
+      //         cartItems: snapshot.data!, // Pass the list of cart items
+      //         productRepository: ProductRepository(),
+      //       );
+      //     }
+      //   },
+      // )
+
       bottomNavigationBar: BottomNavigationBar(
         onTap: _onTabTapped,
         backgroundColor: Colors.white,

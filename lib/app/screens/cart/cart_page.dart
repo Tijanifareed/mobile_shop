@@ -5,11 +5,9 @@ import '../../models/cart_items.dart';
 import '../../models/product.dart';
 
 class CartPage extends StatelessWidget {
-  final List<CartItem> cartItems;
   final ProductRepository _productRepository;
 
   const CartPage({
-    required this.cartItems,
     required ProductRepository productRepository,
     super.key,
   }) : _productRepository = productRepository;
@@ -120,10 +118,10 @@ class CartPage extends StatelessWidget {
 
   Future<List<CartProductView>> _loadCartProducts() async {
     List<CartProductView> views = [];
-    for (final cartItem in cartItems) {
-      final product = await _productRepository.getProductById(cartItem.productId ?? "");
-      views.add(CartProductView(product: product, quantity: cartItem.quantity ?? 0));
-    }
+    // for (final cartItem in cartItems) {
+    //   final product = await _productRepository.getProductById(cartItem.productId ?? "");
+    //   views.add(CartProductView(product: product, quantity: cartItem.quantity ?? 0));
+    // }
     return views;
   }
 
