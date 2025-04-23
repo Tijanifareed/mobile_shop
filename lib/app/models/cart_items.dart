@@ -1,16 +1,16 @@
 import 'package:online_market/app/models/product.dart';
 
 class CartItem {
-  final String id;
-  final String cartId;
-  final String productId;
-  final int quantity;
+   String? id;
+   String? cartId;
+  String? productId;
+  int? quantity;
 
   CartItem({
-    required this.id,
+    this.id,
     required this.cartId,
     required this.productId,
-    required this.quantity
+    this.quantity
   });
 
   Map<String, dynamic> tomap(){

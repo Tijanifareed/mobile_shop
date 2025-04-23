@@ -1,14 +1,14 @@
 import 'package:online_market/app/models/cart_items.dart';
 
 class Cart{
-  final String id;
+  String? id;
   final String userId;
-  final List<CartItem> cartItems;
+  List<CartItem>? cartItems;
 
   Cart({
-    required this.id,
+    this.id,
     required this.userId,
-    required this.cartItems,
+    this.cartItems,
   });
 
   Map<String, dynamic> toMap(){

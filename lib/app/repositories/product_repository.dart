@@ -5,7 +5,10 @@ class ProductRepository{
   final CollectionReference _productsCollection = FirebaseFirestore.instance.collection('products');
 
   Future<void> addProduct(Product product) async {
-    await _productsCollection.doc(product.id).set(product.toMap());
+    final docref =  await _productsCollection.add(product.toMap());
+    final generatedId = docref.id;
+    await docref.update({"id": generatedId});
+    product.id = generatedId;
   }
 
   Future<List<Product>> getAllProducts() async {

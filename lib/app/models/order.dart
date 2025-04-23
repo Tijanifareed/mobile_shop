@@ -2,15 +2,15 @@ import 'package:online_market/app/models/cart.dart';
 
 import 'cart_items.dart';
 
-class Order{
-  final String id;
+class Orders{
+  String? id;
   final String userId;
   final List<CartItem> items;
   final double totalAmount;
   final DateTime createdAt;
 
-  Order({
-    required this.id,
+  Orders({
+    this.id,
     required this.userId,
     required this.items,
     required this.totalAmount,
@@ -27,8 +27,8 @@ class Order{
     };
   }
 
-  factory Order.fromMap(Map<String, dynamic> map){
-    return Order(
+  factory Orders.fromMap(Map<String, dynamic> map){
+    return Orders(
       id: map["id"] ?? "",
       userId: map["userId"] ?? "",
       items: map["items"] ?? "",
@@ -38,7 +38,7 @@ class Order{
 
   }
 
-  Order copyWith({
+  Orders copyWith({
     String? id,
     String? userId,
     List<CartItem>? items,
@@ -46,7 +46,7 @@ class Order{
     DateTime? createdAt,
 
   }){
-    return Order(
+    return Orders(
         id: id ?? this.id,
         userId: userId ?? this.userId,
         items: items ?? this.items,

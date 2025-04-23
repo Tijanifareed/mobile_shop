@@ -1,18 +1,22 @@
+import 'package:online_market/app/constants/product_category.dart';
+
 class Product{
-  String id;
+  String? id;
   String name;
-  double price;
+  String price;
   String imageUrl;
+  ProductCategory category;
   String description;
   final int quantityAvailable;
 
 
 
   Product({
-    required this.id,
+     this.id,
     required this.name,
     required this.price,
     required this.imageUrl,
+    required this.category,
     required this.description,
     required this.quantityAvailable
 });
@@ -23,6 +27,7 @@ class Product{
       "name": name,
       "price": price,
       "imageUrl": imageUrl,
+      "category": category.name,
       "description": description,
       "quantityAvailable": quantityAvailable,
     };
@@ -32,7 +37,8 @@ class Product{
     return Product(
       id: map["id"] ?? "",
       name: map["name"] ?? "",
-      price: (map["price"] ?? 0).toDouble(),
+      price: map["price"] ?? "",
+        category: ProductCategory.values.byName(map['category']),
       imageUrl: map["imageUrl"] ?? "",
       description: map["description"] ?? "",
       quantityAvailable: map["quantityAvailable"] ?? 0
@@ -44,10 +50,11 @@ class Product{
   Product copyWith({
     String? id,
     String? name,
-    double? price,
+    String? price,
     String? imageUrl,
     String? description,
     int? quantityAvailable,
+    ProductCategory? category
   }) {
     return Product(
       id: id ?? this.id,
@@ -55,6 +62,7 @@ class Product{
       price: price ?? this.price,
       imageUrl: imageUrl ?? this.imageUrl,
       description: description ?? this.description,
+      category: category?? this.category,
       quantityAvailable: quantityAvailable ?? this.quantityAvailable,
     );
   }
