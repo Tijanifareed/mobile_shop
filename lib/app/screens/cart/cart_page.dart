@@ -1,142 +1,215 @@
 import 'package:flutter/material.dart';
+import 'package:online_market/app/models/cart.dart';
+import 'package:online_market/app/models/cart_items.dart';
 import 'package:online_market/app/repositories/product_repository.dart';
-import 'package:online_market/app/screens/checkout/check_out_page.dart';
-import '../../models/cart_items.dart';
+import 'package:online_market/app/services/cart_service.dart';
+
 import '../../models/product.dart';
 
-class CartPage extends StatelessWidget {
-  final ProductRepository _productRepository;
-
-  const CartPage({
-    required ProductRepository productRepository,
-    super.key,
-  }) : _productRepository = productRepository;
+class CartPage extends StatefulWidget {
+  final ProductRepository productRepository;
+  const CartPage({super.key,required this.productRepository});
 
   @override
+  State<CartPage> createState() => _CartPageState();
+}
+
+class _CartPageState extends State<CartPage> {
+ CartService cartService = CartService();
+ final cartId = "HjkDCI3wsu5gRAQDL6Qx";
+ late Future<List<CartItem>> _cartItems;
+ late int totalItems;
+ late Future<List<Product?>> _productsInCart;
+
+ @override
+ void initState() {
+   super.initState();
+   _cartItems = printCart(cartId);
+   _productsInCart = _cartItems.then((items) {
+     totalItems = items.length;
+     print("Cart length: ${items.length}");
+     return getAllProductsInCart(items);
+   });
+ }
+
+
+
+
+
+
+
+ @override
   Widget build(BuildContext context) {
-    int allTotal = 0;
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(title:  Text('Cart'), centerTitle: true, backgroundColor: Colors.white,),
-      body: FutureBuilder<List<CartProductView>>(
-        future: _loadCartProducts(),
-        builder: (context, snapshot) {
+     appBar: AppBar(
+       title: Text("Cart"),
+       backgroundColor: Colors.white,
+       elevation: 0,
+     ),
+      // body: Padding(
+      //     padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+      //   child: ListView(
+      //     children: [
+      //       Text("CART SUMMARY",
+      //         style: TextStyle(
+      //           color: Colors.black45,
+      //           fontSize: 15,
+      //         ),
+      //       ),
+      //       Divider(thickness: 2),
+      //       Row(
+      //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //         children: [
+      //
+      //           Text("SubTotal",
+      //             style: TextStyle(
+      //               color: Colors.black,
+      //               fontSize: 16,
+      //             ) ,),
+      //           Text(
+      //             "₦"
+      //           )
+      //
+      //         ],
+      //       ),
+      //       Text("Delivery fees not included yet.",
+      //       style: TextStyle(
+      //         fontSize: 13,
+      //         color: Colors.black54
+      //       ),
+      //       ),
+      //       Divider(thickness: 2),
+      //       // Text("Cart(${totalItems})")
+      //     ],
+      //   ),
+      // )
+      body: FutureBuilder(
+        future: Future.wait([_cartItems, _productsInCart]),
+        builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('Cart is empty'));
+            return Center(child: CircularProgressIndicator());
           }
 
-          final cartViews = snapshot.data!;
-          final total = cartViews.fold(0, (sum, item) {
-            if (item.product == null) return sum;
-            final product = item.product!;
-            return sum + (_parsePrice(product.price) * item.quantity);
-          });
-          allTotal = total;
-          print(allTotal);
+          if (snapshot.hasError) {
+            return Center(child: Text("Error loading cart"));
+          }
 
-          return Column(
-            children: [
-              Expanded(
-                child: ListView.builder(
-                  itemCount: cartViews.length,
-                  itemBuilder: (context, index) {
-                    final item = cartViews[index];
-                    final product = item.product;
+          List<CartItem> cartItems = snapshot.data![0];
+          List<Product?> products = snapshot.data![1];
 
-                    if (product == null) {
-                      return const ListTile(
-                        title: Text("Product not found"),
-                        subtitle: Text("This product may have been removed."),
-                        trailing: Text("₦0.00"),
-                      );
-                    }
+          return ListView.builder(
+            itemCount: cartItems.length,
+            itemBuilder: (context, index) {
+              final item = cartItems[index];
+              final product = products[index];
 
-                    final price = _parsePrice(product.price);
-                    final totalForItem = price * item.quantity;
+              return Card(
+                color: Colors.white,
+                margin: EdgeInsets.symmetric(vertical: 8),
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Row(
+                    children: [
+                      // Product image
+                      Image.network(product?.imageUrl ?? '', width: 60, height: 60, fit: BoxFit.cover),
+                      SizedBox(width: 10),
 
-                    return ListTile(
-                      leading: Image.network(
-                        product.imageUrl ?? '',
-                        width: 60,
-                        height: 60,
-                        fit: BoxFit.cover,
+                      // Details
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(product?.name ?? '', style: TextStyle(fontWeight: FontWeight.bold)),
+                            Text("Category: ${product?.category.name ?? ''}", style: TextStyle(fontSize: 13)),
+                            Row(
+                              children: [
+                                Text("₦${product?.price}", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                SizedBox(width: 8),
+                                SizedBox(width: 4),
+                                Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                  // child: Text("-${product?.discount ?? 0}%", style: TextStyle(color: Colors.orange)),
+                                ),
+                              ],
+                            ),
+                            Text("In Stock", style: TextStyle(color: Colors.green)),
+                          ],
+                        ),
                       ),
-                      title: Text(product.name ?? ''),
-                      subtitle: Text("Quantity: ${item.quantity}"),
-                      trailing: Text("₦${totalForItem.toString()}"),
-                    );
-
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "Total:",
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                        ),
-                        Text(
-                          "₦${total.toString()}",
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
+                      ElevatedButton(
+                          onPressed: (){
+                            _removeItemFromCart(product);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('${product?.name} removed from cart successfully')),
+                            );
+                          },
+                          child: Text(
+                            "Remove Item",
+                          style: TextStyle(
+                        fontSize: 7,
+                            color: Colors.white
+                      ),
+                      ),
                         style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black
-                        ),
-                        onPressed: () {
-                          // Proceed to checkout logic here
-                          Navigator.push(context,
-                            MaterialPageRoute(builder: (context)=> CheckOutPage(allTotal)),
-                          );
-
-                        },
-                        child: const Text("Proceed to checkout", style: TextStyle(color: Colors.white),),
+                          backgroundColor: Colors.black,
+                        )
                       ),
-                    )
-                  ],
+
+                      // Quantity Controls
+                      Column(
+                        children: [
+                          IconButton(onPressed: () {}, icon: Icon(Icons.add, color: Colors.black)),
+                          Text(item.quantity.toString()),
+                          IconButton(onPressed: () {}, icon: Icon(Icons.remove, color: Colors.black)),
+                        ],
+                      )
+                    ],
+                  ),
                 ),
-              )
-            ],
+              );
+            },
           );
         },
       ),
+
+
+
     );
   }
 
-  Future<List<CartProductView>> _loadCartProducts() async {
-    List<CartProductView> views = [];
-    // for (final cartItem in cartItems) {
-    //   final product = await _productRepository.getProductById(cartItem.productId ?? "");
-    //   views.add(CartProductView(product: product, quantity: cartItem.quantity ?? 0));
-    // }
-    return views;
-  }
+ Future<List<CartItem>> printCart(String cartId) async {
+   try {
+     final cartItems = await cartService.getUserCart(cartId);
+     return cartItems;
+   } catch (e) {
+     throw Exception("No Cart Item");
+   }
+ }
 
-  int _parsePrice(String? priceString) {
-    if (priceString == null || priceString.isEmpty) return 0;
-    final cleaned = priceString.replaceAll(",", "");
-    return int.tryParse(cleaned) ?? 0;
-  }
-}
+ Future<List<Product?>> getAllProductsInCart(List<CartItem> cartItems) async {
+   try {
+     final futures = cartItems.map((item) {
+       final id = item.productId ?? "";
+       return widget.productRepository.getProductById(id);
+     }).toList();
+     return await Future.wait(futures);
+   } catch (e) {
+     throw Exception("No Cart found");
+   }
+ }
+
+ void _removeItemFromCart(Product? product) async {
+   await cartService.removeItemFromCart(product?.id ?? "", cartId);
+
+   setState(() {
+     _cartItems = printCart(cartId);
+     _productsInCart = _cartItems.then((items) {
+       totalItems = items.length;
+       return getAllProductsInCart(items);
+     });
+   });
+ }
 
 
-
-class CartProductView {
-  final Product? product;
-  final int quantity;
-
-  CartProductView({required this.product, required this.quantity});
 }

@@ -112,7 +112,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () async {
-                  final cartItem = CartItem(productId:widget.product.id, cartId: cartId, quantity: 2);
+                  final cartItem = CartItem(productId:widget.product.id, cartId: cartId, quantity: 0);
                   try {
                     if (widget.product.quantityAvailable > 0) {
                       await _cartService.addToCart(cartItem);

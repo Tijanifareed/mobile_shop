@@ -30,9 +30,35 @@ class CartService{
         return items.map((e) => CartItem.fromMap(e)).toList();
       }catch(e){
         throw Exception("Failed to fetch cart: $e");
-
       }
     }
+
+  Future<void> removeItemFromCart(String productId, String cartId) async {
+    try {
+      final docSnapshot = await _cartCollection.doc(cartId).get();
+
+      if (!docSnapshot.exists) {
+        throw Exception("No cart found.");
+      }
+
+      final data = docSnapshot.data();
+      if (data == null || !data.containsKey('cartItems')) {
+        throw Exception("Cart is empty.");
+      }
+
+      List<dynamic> items = List.from(data['cartItems']);
+
+      // Remove the item with matching productId
+      items.removeWhere((item) => item['productId'] == productId);
+
+      // Update the cart in Firestore
+      await _cartCollection.doc(cartId).update({'cartItems': items});
+      print("Item removed successfully.");
+    } catch (e) {
+      print("Failed to remove item: $e");
+      rethrow;
+    }
+  }
 
 
 
