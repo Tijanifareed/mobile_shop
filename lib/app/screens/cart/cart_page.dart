@@ -47,42 +47,7 @@ class _CartPageState extends State<CartPage> {
        backgroundColor: Colors.white,
        elevation: 0,
      ),
-      // body: Padding(
-      //     padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-      //   child: ListView(
-      //     children: [
-      //       Text("CART SUMMARY",
-      //         style: TextStyle(
-      //           color: Colors.black45,
-      //           fontSize: 15,
-      //         ),
-      //       ),
-      //       Divider(thickness: 2),
-      //       Row(
-      //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //         children: [
-      //
-      //           Text("SubTotal",
-      //             style: TextStyle(
-      //               color: Colors.black,
-      //               fontSize: 16,
-      //             ) ,),
-      //           Text(
-      //             "₦"
-      //           )
-      //
-      //         ],
-      //       ),
-      //       Text("Delivery fees not included yet.",
-      //       style: TextStyle(
-      //         fontSize: 13,
-      //         color: Colors.black54
-      //       ),
-      //       ),
-      //       Divider(thickness: 2),
-      //       // Text("Cart(${totalItems})")
-      //     ],
-      //   ),
+
       // )
       body: FutureBuilder(
         future: Future.wait([_cartItems, _productsInCart]),
@@ -147,7 +112,7 @@ class _CartPageState extends State<CartPage> {
                           child: Text(
                             "Remove Item",
                           style: TextStyle(
-                        fontSize: 7,
+                        fontSize: 10,
                             color: Colors.white
                       ),
                       ),
@@ -177,6 +142,51 @@ class _CartPageState extends State<CartPage> {
 
     );
   }
+
+ void _handleCheckout(List<CartItem> items, List<Product?> products) {
+   double total = 0;
+
+   for (int i = 0; i < items.length; i++) {
+     final product = products[i];
+     final quantity = items[i].quantity;
+
+     if (product != null && product.price is String) {
+       try {
+         // Remove commas from price string, parse to double
+         final cleanPrice = product.price.replaceAll(',', '');
+         final price = double.tryParse(cleanPrice) ?? 0.0;
+
+         total += price * quantity!;
+       } catch (e) {
+         print("Failed to parse price: ${product.price}");
+       }
+     }
+   }
+
+   showDialog(
+     context: context,
+     builder: (context) => AlertDialog(
+       title: Text("Checkout"),
+       content: Text("Total amount: ₦${total.toStringAsFixed(2)}\nProceed to payment?"),
+       actions: [
+         TextButton(
+           onPressed: () => Navigator.of(context).pop(),
+           child: Text("Cancel"),
+         ),
+         ElevatedButton(
+           onPressed: () {
+             Navigator.of(context).pop();
+             ScaffoldMessenger.of(context).showSnackBar(
+               SnackBar(content: Text("Checkout initiated")),
+             );
+             // Add your real checkout logic here
+           },
+           child: Text("Proceed"),
+         ),
+       ],
+     ),
+   );
+ }
 
  Future<List<CartItem>> printCart(String cartId) async {
    try {
